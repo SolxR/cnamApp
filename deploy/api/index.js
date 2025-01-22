@@ -12,28 +12,30 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// Allow requests from all origins
+app.use(cors({ origin: '*' }));
+
 app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/produit', productRoutes);
 
 const startServer = async () => {
-    try {
-        await sequelize.authenticate();
-        console.log('Connexion réussie à la base de données');
+  try {
+    await sequelize.authenticate();
+    console.log('Connexion réussie à la base de données');
 
-        await sequelize.sync({ alter: true });
-        console.log('Modèles synchronisés avec la base de données');
+    await sequelize.sync({ alter: true });
+    console.log('Modèles synchronisés avec la base de données');
 
-        console.log('Aucune donnée fictive n’a été insérée.');
+    console.log('Aucune donnée fictive n’a été insérée.');
 
-        const PORT = process.env.PORT || 443;
-        app.listen(PORT, () => {
-            console.log(`Le serveur tourne sur http://localhost:${PORT}`);
-        });
-    } catch (err) {
-        console.error('Erreur lors du démarrage du serveur :', err);
-    }
+    const PORT = process.env.PORT || 443;
+    app.listen(PORT, () => {
+      console.log(`Le serveur tourne sur http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error('Erreur lors du démarrage du serveur :', err);
+  }
 };
 
 startServer();
