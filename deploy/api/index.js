@@ -1,43 +1,39 @@
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const sequelize = require('./config/db.js');
+const User = require('./models/User.js');
+const Produit = require('./models/Produit.js');
+const authRoutes = require('./routes/auth.js');
+const productRoutes = require('./routes/produit.js');
+const auth = require('./middleware/auth.js');
 
-const app  = express ();
+dotenv.config();
 
-var corsOptions = {
-  origin: "*",
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  headers: 'Content-Type, Authorization',
-  exposedHeaders:'Authorization'
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use('/auth', authRoutes);
+app.use('/produit', productRoutes);
+
+const startServer = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('Connexion réussie à la base de données');
+
+        await sequelize.sync({ alter: true });
+        console.log('Modèles synchronisés avec la base de données');
+
+        console.log('Aucune donnée fictive n’a été insérée.');
+
+        const PORT = process.env.PORT || 443;
+        app.listen(PORT, () => {
+            console.log(`Le serveur tourne sur http://localhost:${PORT}`);
+        });
+    } catch (err) {
+        console.error('Erreur lors du démarrage du serveur :', err);
+    }
 };
 
-app.use(cors(corsOptions));
-
-// parse requests of content-type - application/json
-app.use(express.json());
-
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
-
-// simple route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to CNAM application." });
-});
-
-const db = require("./models");
-
-db.sequelize.sync()
-  .then(() => {
-    console.log("Synced db.");
-  })
-  .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
-  });
-
-require("./routes")(app);
-
-// set port, listen for requests
-const PORT =  443;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
-
+startServer();
