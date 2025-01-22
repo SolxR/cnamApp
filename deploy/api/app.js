@@ -27,7 +27,7 @@ const startServer = async () => {
 
         console.log('Aucune donnée fictive n’a été insérée.');
 
-        const PORT = process.env.PORT || 5432;
+        const PORT = process.env.PORT || 443;
         app.listen(PORT, () => {
             console.log(`Le serveur tourne sur http://localhost:${PORT}`);
         });
